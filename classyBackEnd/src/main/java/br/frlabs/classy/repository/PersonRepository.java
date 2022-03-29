@@ -12,4 +12,6 @@ public interface PersonRepository extends JpaRepository<PersonEntity, Long> {
     List<PersonEntity> findByCrewId(Long crewId);
 
     Optional<PersonEntity> findByNickname(String nickname);
+
+    Optional<PersonEntity> findByEmail(String email);
 }

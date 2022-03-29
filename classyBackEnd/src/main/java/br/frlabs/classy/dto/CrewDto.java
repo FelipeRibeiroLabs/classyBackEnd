@@ -2,9 +2,12 @@ package br.frlabs.classy.dto;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+
 @Data
 public class CrewDto {
 
+    @NotBlank
     private String name;
 
     private Long schoolId;

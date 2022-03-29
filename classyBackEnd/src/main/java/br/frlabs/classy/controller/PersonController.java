@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @CrossOrigin(origins = "*")
@@ -27,7 +28,7 @@ public class PersonController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public PersonDto createPerson(@RequestBody PersonDto request) {
+    public PersonDto createPerson(@RequestBody @Valid PersonDto request) {
         return personService.createPerson(request);
     }
 
