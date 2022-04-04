@@ -9,7 +9,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -20,11 +19,11 @@ public class PersonController {
     private final PersonService personService;
 
 
-    @GetMapping(value = "{id}",produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public List<PersonEntity> getAllPersonFromCrew(@PathVariable(value = "id") Long id) {
-        return personService.listAllPersonFromCrew(id);
-    }
+//    @GetMapping(value = "{id}",produces = MediaType.APPLICATION_JSON_VALUE)
+//    @ResponseStatus(HttpStatus.OK)
+//    public List<PersonEntity> getAllPersonFromCrew(@PathVariable(value = "id") Long id) {
+//        return personService.listAllPersonFromCrew(id);
+//    }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
@@ -48,4 +47,12 @@ public class PersonController {
 
     //todo -> RemovePerson
 
+    @PostMapping(value = "{admId}")
+    public void addPersonToAdmin(
+            @PathVariable("admId") Long admId,
+            @RequestParam Long crewId,
+            @RequestParam String nickname
+    ) {
+        personService.addPersonToAdmInCrew(admId, crewId, nickname);
+    }
 }

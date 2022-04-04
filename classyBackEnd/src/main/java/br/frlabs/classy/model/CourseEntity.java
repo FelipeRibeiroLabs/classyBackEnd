@@ -15,7 +15,7 @@ public class CourseEntity {
 
     private String courseName;
 
-    //todo -> Change to ManyToMany
+
     @ManyToOne
     @JoinColumn(name = "university_id")
     private UniversityEntity university;

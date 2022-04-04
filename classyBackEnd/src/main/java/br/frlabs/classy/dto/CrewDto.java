@@ -3,6 +3,7 @@ package br.frlabs.classy.dto;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @Data
 public class CrewDto {
@@ -23,4 +24,6 @@ public class CrewDto {
 
     private String logo_url;
     private String instagram;
+
+    private List<String> nicknames;
 }

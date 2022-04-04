@@ -1,0 +1,1 @@
+ALTER TABLE crew ADD COLUMN logo_url varchar(255);

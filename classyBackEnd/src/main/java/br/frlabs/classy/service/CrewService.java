@@ -3,30 +3,32 @@ package br.frlabs.classy.service;
 import br.frlabs.classy.dto.CrewDto;
 import br.frlabs.classy.enums.SchoolYearEnum;
 import br.frlabs.classy.enums.UniversityStatusEnum;
+import br.frlabs.classy.exception.ApiRequestException;
 import br.frlabs.classy.mapper.CrewToDtoMapper;
 import br.frlabs.classy.model.CrewEntity;
 import br.frlabs.classy.model.EsportEntity;
+import br.frlabs.classy.model.PersonEntity;
 import br.frlabs.classy.model.UniversityEntity;
-import br.frlabs.classy.repository.CrewRepository;
-import br.frlabs.classy.repository.EsportRepository;
-import br.frlabs.classy.repository.SchoolRepository;
-import br.frlabs.classy.repository.UniversityRepository;
+import br.frlabs.classy.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class CrewService {
 
     private final CrewRepository crewRepository;
+    private final PersonRepository personRepository;
     private final SchoolRepository schoolRepository;
     private final UniversityRepository universityRepository;
     private final EsportRepository esportRepository;
     private final CrewToDtoMapper mapperToDto;
 
-    public CrewDto createCrew(CrewDto request) {
+    public CrewDto createCrew(Long personId, CrewDto request) {
+        PersonEntity person = personRepository.getById(personId);
         CrewEntity crewEntity = new CrewEntity();
         UniversityEntity university = new UniversityEntity();
         EsportEntity esport = new EsportEntity();
@@ -51,8 +53,10 @@ public class CrewService {
 
         crewEntity.setUniversityStatus(UniversityStatusEnum.getEnum(request.getUniversityStatus()));
 
-
         crewRepository.save(crewEntity);
+        person.getAdmCrew().add(crewEntity);
+        person.getCrews().add(crewEntity);
+        personRepository.save(person);
         return request;
     }
 
@@ -83,6 +87,23 @@ public class CrewService {
     //Todo -> Alterar para CrewDto
     public CrewDto findCrewById(Long id) {
         return mapperToDto.toDto(crewRepository.getById(id));
+    }
+
+
+    public void addPersonInCrew(Long admin, Long crewId, String nickname) {
+        PersonEntity personAdmin = personRepository.getById(admin);
+        if(personAdmin.getAdmCrew().stream().noneMatch(e -> Objects.equals(e.getId(), crewId))) {
+            throw new ApiRequestException("Você não tem permissão para adicionar uma nova pessoa!");
+        }
+
+        CrewEntity crew = crewRepository.getById(crewId);
+        if(personAdmin.getCrews().stream().noneMatch(e -> Objects.equals(e, crew))){
+            throw new ApiRequestException("Você não faz parte desta turma!");
+        }
+
+        PersonEntity person = personRepository.findByNickname(nickname).get();
+        crew.getPersons().add(person);
+        crewRepository.save(crew);
     }
 
 }

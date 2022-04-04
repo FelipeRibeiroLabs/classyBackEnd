@@ -1,7 +1,6 @@
 package br.frlabs.classy.controller;
 
 import br.frlabs.classy.dto.CrewDto;
-import br.frlabs.classy.exception.ApiRequestException;
 import br.frlabs.classy.model.CrewEntity;
 import br.frlabs.classy.service.CrewService;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +23,8 @@ public class CrewController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<CrewEntity> getAllCrews() {
-        throw new ApiRequestException("Ops, ocorreu um erro em nosso servidor!");
-//        return crewService.getAllCrews();
+//        throw new ApiRequestException("Ops, ocorreu um erro em nosso servidor!");
+        return crewService.getAllCrews();
     }
 
     @GetMapping(path = "{id}",produces = MediaType.APPLICATION_JSON_VALUE)
@@ -35,16 +34,25 @@ public class CrewController {
     }
 
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "{personId}",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public CrewDto createCrew(@RequestBody @Valid CrewDto request) {
-        return crewService.createCrew(request);
+    public CrewDto createCrew(@PathVariable("personId") Long personId, @RequestBody @Valid CrewDto request) {
+        return crewService.createCrew(personId, request);
     }
 
     @PutMapping(path = "/{crewId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateCrew(@RequestBody CrewDto request, @PathVariable("crewId") Long crewId) {
         crewService.updateCrew(request, crewId);
+    }
+
+    @PostMapping(path = "{crewId}")
+    public void addPersonInCrew(
+            @PathVariable("crewId") Long crewId,
+            @RequestParam Long person,
+            @RequestParam String nickname
+    ) {
+        crewService.addPersonInCrew(person ,crewId, nickname);
     }
 
 }

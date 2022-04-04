@@ -1,10 +1,12 @@
 package br.frlabs.classy.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -21,9 +23,25 @@ public class PersonEntity {
     private String email;
     private int number;
 
-    @ManyToOne
-    @JoinColumn(name = "crew_id")
-    private CrewEntity crew;
+    @ManyToMany()
+    @JsonIgnore
+    @JoinTable(
+             name = "crew_person",
+            uniqueConstraints = @UniqueConstraint(columnNames = {"person_id", "crew_id"}),
+            joinColumns = {@JoinColumn(name = "person_id")},
+            inverseJoinColumns = {@JoinColumn(name = "crew_id")}
+    )
+    private List<CrewEntity> crews;
+
+    @ManyToMany
+    @JsonIgnore
+    @JoinTable(
+            name = "admin",
+            uniqueConstraints = @UniqueConstraint(columnNames = {"person_id", "crew_id"}),
+            joinColumns = {@JoinColumn(name = "person_id")},
+            inverseJoinColumns = {@JoinColumn(name = "crew_id")}
+    )
+    private List<CrewEntity> admCrew;
 
     @CreationTimestamp
     private LocalDateTime created_at;

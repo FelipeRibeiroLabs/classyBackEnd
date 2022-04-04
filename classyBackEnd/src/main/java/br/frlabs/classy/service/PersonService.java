@@ -2,25 +2,28 @@ package br.frlabs.classy.service;
 
 import br.frlabs.classy.dto.PersonDto;
 import br.frlabs.classy.exception.ApiRequestException;
+import br.frlabs.classy.model.CrewEntity;
 import br.frlabs.classy.model.PersonEntity;
+import br.frlabs.classy.repository.CrewRepository;
 import br.frlabs.classy.repository.PersonRepository;
 import br.frlabs.classy.utils.EmailValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class PersonService {
 
     private final PersonRepository personRepository;
+    private final CrewRepository crewRepository;
     private final EmailValidator emailValidator;
 
-    public List<PersonEntity> listAllPersonFromCrew(Long crewId) {
-        List<PersonEntity> listByCrew = personRepository.findByCrewId(crewId);
-        return listByCrew;
-    }
+//    public List<PersonEntity> listAllPersonFromCrew(Long crewId) {
+//        List<PersonEntity> listByCrew = personRepository.findByCrewId(crewId);
+//        return listByCrew;
+//    }
 
     public PersonDto createPerson(PersonDto request) {
         PersonEntity person = new PersonEntity();
@@ -54,6 +57,25 @@ public class PersonService {
 
     public void removePerson(Long id) {
         personRepository.delete(personRepository.getById(id));
+    }
+
+    public void addPersonToAdmInCrew(Long adminId ,Long crewId, String nickname) {
+        PersonEntity admin = personRepository.getById(adminId);
+        CrewEntity crew = crewRepository.getById(crewId);
+        PersonEntity personToAdd = personRepository
+                .findByNickname(nickname)
+                .orElseThrow(() -> new ApiRequestException("Nickname não encontrado!"));
+
+        if(personToAdd.getCrews().stream().noneMatch(e -> Objects.equals(e, crew))){
+            throw new ApiRequestException("Essa pessoa não está presente na sua turma!");
+        }
+
+        if(admin.getAdmCrew().stream().anyMatch(e -> Objects.equals(e.getId(), crewId))) {
+            personToAdd.getAdmCrew().add(crew);
+            personRepository.save(personToAdd);
+        } else {
+            throw new ApiRequestException("Você não possui permissão!");
+        }
     }
 
 }
